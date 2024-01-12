@@ -2,4 +2,6 @@
 *.swp
 .idea/
 totp
+totp*.exe
 test
+test*.exe
