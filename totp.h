@@ -46,7 +46,7 @@ void hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
 
 /* returns code */
 int hotp(const uint8_t key[64], uint64_t counter);
-int totp(const uint8_t key[64]);
+int totp(const uint8_t key[64], uint64_t time);
 
 /* writes to buf, returns length */
 size_t from_base32(const char *s, uint8_t *buf, size_t cap);

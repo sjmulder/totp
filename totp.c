@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <string.h>
-#include <time.h>
 #include <assert.h>
 #include "totp.h"
 
@@ -92,9 +91,9 @@ hotp(const uint8_t key[64], uint64_t counter)
 
 /* RFC 6238 */
 int
-totp(const uint8_t key[64])
+totp(const uint8_t key[64], uint64_t time)
 {
-	return hotp(key, time(NULL) / 30);
+	return hotp(key, time / 30);
 }
 
 /* RFC 4648 */

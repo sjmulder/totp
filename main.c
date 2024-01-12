@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "totp.h"
 
 int
@@ -39,6 +40,6 @@ main(int argc, char **argv)
 	memset(key, 0, sizeof(key));
 	from_base32(seed, key, sizeof(key));
 
-	printf("%d\n", totp(key));
+	printf("%d\n", totp(key, time(NULL)));
 	return 0;
 }
