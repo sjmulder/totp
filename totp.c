@@ -22,7 +22,7 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	    0x8F1BBCDC, 0xCA62C1D6 };
 
 	size_t len2, i,t;		/* len2 = len after paddnig */
-	uint32_t h[4], w[80];		/* hash values, msg shedule */
+	uint32_t h[5], w[80];		/* hash values, msg shedule */
 	uint32_t a,b,c,d,e, f, T;	/* working variables */
 
 	/* 5.1.1 (padding) */
