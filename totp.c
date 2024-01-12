@@ -99,7 +99,7 @@ hotp(const uint8_t key[64], uint64_t counter)
 
 	trunc = ntohl(*(uint32_t *)&hash[hash[19] & 0xF]) & 0x7FFFFFFF;
 
-	return trunc % 1000000;
+	return (int)(trunc % 1000000);
 }
 
 /* RFC 6238 */
