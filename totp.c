@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 #include "totp.h"
@@ -106,8 +107,10 @@ from_base32(const char *s, uint8_t *buf, size_t cap)
 	uint8_t v[8];
 	char c;
 
-	assert(strlen(s) % 8 == 0);
-	assert(cap >= (strlen(s)+1)/8*5);
+	if (strlen(s) % 8)
+		return 0;
+	if (cap < (strlen(s)+1)/8*5)
+		return 0;
 
 	for (i=0; s[i*8]; i++) {
 		for (j=0; j<8; j++)

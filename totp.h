@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <time.h>
-#include <assert.h>
 
 enum {
 	TOTP_OK,
@@ -38,7 +33,6 @@ pack32(const uint8_t a[4])
 static inline uint32_t
 rotl(uint32_t x, int n)
 {
-	assert(n >= 0); assert(n <= 32);
 	return x << n | x >> (32-n);
 }
 
