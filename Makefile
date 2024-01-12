@@ -1,3 +1,6 @@
+SRC.totp=	totp.c main.c
+SRC.test=	totp.c test.c
+
 CFLAGS+=	-Wall -Wextra
 
 all: totp test
@@ -8,10 +11,10 @@ clean:
 check: all
 	./test
 
-totp: totp.c
-	${LINK.c} -o totp totp.c
+totp: ${SRC.totp} *.h
+	${LINK.c} -o totp ${SRC.totp}
 
-test: totp.c
-	${LINK.c} -DTEST -o test totp.c
+test: ${SRC.test} *.h
+	${LINK.c} -o test ${SRC.test}
 
 .PHONY: all clean check
