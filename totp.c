@@ -21,8 +21,8 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	static const uint32_t k[] = { 0x5A827999, 0x6ED9EBA1,
 	    0x8F1BBCDC, 0xCA62C1D6 };
 
-	size_t len2, i,t;		/* len2 = len after paddnig */
-	uint32_t h[5], w[80];		/* hash values, msg shedule */
+	size_t len2, i,t;		/* len2 = len after padding */
+	uint32_t h[5], w[80];		/* hash values, msg schedule */
 	uint32_t a,b,c,d,e, f, T;	/* working variables */
 
 	/* 5.1.1 (padding) */
