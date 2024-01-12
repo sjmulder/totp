@@ -2,8 +2,32 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-#include <arpa/inet.h>
 #include <assert.h>
+
+/* convert u32 to 4 bytes, big-endian */
+static void
+unpack32(uint32_t x, uint8_t a[4])
+{
+	a[0] = (uint8_t)(x >> 24);
+	a[1] = (uint8_t)(x >> 16);
+	a[2] = (uint8_t)(x >> 8);
+	a[3] = (uint8_t)x;
+}
+
+/* convert u64 to 8 bytes, big-endian */
+static void
+unpack64(uint64_t x, uint8_t a[8])
+{
+	unpack32((uint32_t)(x >> 32), &a[0]);
+	unpack32((uint32_t)x, &a[4]);
+}
+
+/* convert 4 bytes to u32, big-endian */
+static uint32_t
+pack32(const uint8_t a[4])
+{
+	return (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | a[3];
+}
 
 /* FIPS 180-3 2.2.2 */
 static uint32_t
@@ -32,8 +56,7 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 
 	memset(buf+len, 0, len2-len);
 	buf[len] = 1<<7;
-	*(uint32_t *)&buf[len2-8] = htonl((uint32_t)(len*8 >> 32));
-	*(uint32_t *)&buf[len2-4] = htonl((uint32_t)(len*8));
+	unpack64(len*8, &buf[len2-8]);
 
 	/* 5.3.1 */
 	h[0] = 0x67452301; h[1] = 0xEFCDAB89; h[2] = 0x98BADCFE;
@@ -42,7 +65,7 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	/* 6.1.2 */
 	for (i=0; i < len2/64; i++) {
 		for (t=0; t<16; t++)
-			w[t] = ntohl(*(uint32_t *)&buf[i*64 + t*4]);
+			w[t] = pack32(&buf[i*64 + t*4]);
 		for (; t<80; t++)
 			w[t] = rotl(w[t-3]^w[t-8]^w[t-14]^w[t-16], 1);
 
@@ -63,7 +86,7 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	}
 
 	for (i=0; i<5; i++)
-		*(uint32_t *)&hash[i*4] = htonl(h[i]);
+		unpack32(h[i], &hash[i*4]);
 }
 
 /* RFC 2104; outputs to hash */
@@ -92,11 +115,10 @@ hotp(const uint8_t key[64], uint64_t counter)
 	uint8_t data[8], hash[20];
 	uint32_t trunc;
 
-	*(uint32_t *)&data[0] = htonl((uint32_t)(counter >> 32));
-	*(uint32_t *)&data[4] = htonl((uint32_t)counter);
+	unpack64(counter, data);
 	hmac_sha1(key, data, 8, hash);
 
-	trunc = ntohl(*(uint32_t *)&hash[hash[19] & 0xF]) & 0x7FFFFFFF;
+	trunc = pack32(&hash[hash[19] & 0xF]) & 0x7FFFFFFF;
 
 	return (int)(trunc % 1000000);
 }
@@ -154,6 +176,30 @@ to_hex(const uint8_t *a, size_t len, char *buf)
 	}
 
 	buf[len*2] = '\0';
+}
+
+static void
+test_pack(void)
+{
+	uint8_t a[8];
+
+	unpack32(0x12345678, a);
+	assert(a[0] == 0x12);
+	assert(a[1] == 0x34);
+	assert(a[2] == 0x56);
+	assert(a[3] == 0x78);
+
+	unpack64(0x123456789ABCDEF0, a);
+	assert(a[0] == 0x12);
+	assert(a[1] == 0x34);
+	assert(a[2] == 0x56);
+	assert(a[3] == 0x78);
+	assert(a[4] == 0x9A);
+	assert(a[5] == 0xBC);
+	assert(a[6] == 0xDE);
+	assert(a[7] == 0xF0);
+
+	assert(pack32(a) == 0x12345678);
 }
 
 static void
@@ -231,6 +277,7 @@ test_from_base64(void)
 int
 main()
 {
+	test_pack();
 	test_sha1();
 	test_hmac_sha1();
 	test_hotp();
