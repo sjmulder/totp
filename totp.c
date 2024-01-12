@@ -26,9 +26,8 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	uint32_t a,b,c,d,e, f, T;	/* working variables */
 
 	/* 5.1.1 (padding) */
-	assert(len < SIZE_MAX/64*64 - 9);
-	len2 = (len+9+64-1)/64*64;	/* ceil len+9 to 64 multiple */
-	assert(len2 >= len);
+	assert(len < SIZE_MAX-9-63);	/* don't overflow size_t */
+	len2 = (len+9+63)/64*64;	/* ceil len+9 to 64 multiple */
 	assert(len2 <= cap);
 
 	memset(buf+len, 0, len2-len);
