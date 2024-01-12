@@ -123,7 +123,7 @@ from_base32(const char *s, uint8_t *buf, size_t cap)
 	for (i=0; s[i*8]; i++) {
 		for (j=0; j<8; j++)
 			if ((c = s[i*8+j]) == '=') v[j] = 0;
-			else if (c>='A' && c<='z') v[j] = c-'A';
+			else if (c>='A' && c<='Z') v[j] = c-'A';
 			else if (c>='a' && c<='z') v[j] = c-'a';
 			else if (c>='2' && c<='7') v[j] = c-'2' + 26;
 			else assert(!"bad base32 char");
