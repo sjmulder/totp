@@ -1,14 +1,22 @@
 PROGS?=		totp test
 PROGS.cross?=	totp32.exe test32.exe \
-		totp64.exe test64.exe
+		totp64.exe test64.exe \
+		totp.wasm
 
 SRC.totp=	totp.c main.c
 SRC.test=	totp.c test.c
+SRC.wasm=	totp.c std.c
 
 CC.win32?=	i686-w64-mingw32-gcc
 CC.win64?=	x86_64-w64-mingw32-gcc
+CC.wasm?=	clang -target wasm32
 
 CFLAGS+=	-Wall -Wextra
+CFLAGS.wasm+=	-Wall -Wextra -nostdlib -fvisibility=hidden -DNO_STD
+
+LDFLAGS.wasm+=	-Wl,--no-entry -Wl,--export-dynamic
+
+LINK.wasm=	${CC.wasm} ${CFLAGS.wasm} ${LDFLAGS.wasm}
 
 all:   ${PROGS}
 cross: ${PROGS.cross}
@@ -31,6 +39,9 @@ totp32.exe: ${SRC.totp} *.h
 
 totp64.exe: ${SRC.totp} *.h
 	${CC.win64} ${CFLAGS} -o $@ ${SRC.totp}
+
+totp.wasm: ${SRC.wasm} *.h
+	${LINK.wasm} -o $@ ${SRC.wasm}
 
 test: ${SRC.test} *.h
 	${LINK.c} -o test ${SRC.test}

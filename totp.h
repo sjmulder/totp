@@ -1,3 +1,4 @@
+#define TOTP_EXPORT	__attribute__((visibility("default")))
 
 enum {
 	TOTP_OK,
@@ -47,7 +48,8 @@ rotl(uint32_t x, int n)
  *
  * Returns TOTP_OK on success, TOTP_* on error
  */
-int sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20]);
+TOTP_EXPORT int sha1(uint8_t *buf, size_t len, size_t cap,
+    uint8_t hash[20]);
 
 /*
  * RFC 2104
@@ -60,8 +62,8 @@ int sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20]);
  *
  * Returns TOTP_OK on success, TOTP_* on error
  */
-int hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
-    uint8_t hash[20]);
+TOTP_EXPORT int hmac_sha1(const uint8_t key[64], const uint8_t *data,
+    size_t len, uint8_t hash[20]);
 
 /*
  * RFC 4226
@@ -72,7 +74,7 @@ int hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
  *
  * Returns HOTP code or -1 on error.
  */
-int hotp(const uint8_t key[64], uint64_t counter);
+TOTP_EXPORT int hotp(const uint8_t key[64], uint64_t counter);
 
 /*
  * RFC 6238
@@ -83,7 +85,7 @@ int hotp(const uint8_t key[64], uint64_t counter);
  *
  * Returns HOTP code or -1 on error.
  */
-int totp(const uint8_t key[64], uint64_t time);
+TOTP_EXPORT int totp(const uint8_t key[64], uint64_t time);
 
 /*
  * RFC 4648
@@ -95,4 +97,4 @@ int totp(const uint8_t key[64], uint64_t time);
  *
  * Returns number of bytes written to buf, or 0 for invalid base32.
  */
-size_t from_base32(const char *s, uint8_t *buf, size_t cap);
+TOTP_EXPORT size_t from_base32(const char *s, uint8_t *buf, size_t cap);

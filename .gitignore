@@ -3,5 +3,6 @@
 .idea/
 totp
 totp*.exe
+totp.wasm
 test
 test*.exe

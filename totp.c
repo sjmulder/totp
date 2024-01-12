@@ -1,7 +1,15 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <string.h>
 #include "totp.h"
+
+#ifndef NO_STD
+# include <string.h>
+#else
+/* TODO: for some reason these are exported in wasm */
+void *memset(void *s, int c, size_t n);
+void *memcpy(void *dst, const void *src, size_t n);
+size_t strlen(const char *s);
+#endif
 
 /* FIPS 180-3 6.1.1 */
 int
