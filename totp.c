@@ -1,10 +1,9 @@
 #include <stdint.h>
 #include <string.h>
-#include <assert.h>
 #include "totp.h"
 
 /* FIPS 180-3 6.1.1 */
-void
+int
 sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 {
 	/* 4.2.1, use k[t/20] */
@@ -16,9 +15,11 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	uint32_t a,b,c,d,e, f, T;	/* working variables */
 
 	/* 5.1.1 (padding) */
-	assert(len < SIZE_MAX-9-63);	/* don't overflow size_t */
+	if (len >= SIZE_MAX-9-63)
+		return TOTP_EBOUNDS;
 	len2 = (len+9+63)/64*64;	/* ceil len+9 to 64 multiple */
-	assert(len2 <= cap);
+	if (len2 > cap)
+		return TOTP_EBOUNDS;
 
 	memset(buf+len, 0, len2-len);
 	buf[len] = 1<<7;
@@ -53,17 +54,19 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 
 	for (i=0; i<5; i++)
 		unpack32(h[i], &hash[i*4]);
+
+	return TOTP_OK;
 }
 
-/* RFC 2104 */
-void
+int
 hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
     uint8_t hash[20])
 {
 	uint8_t buf[196];
 	size_t i;
 
-	assert(len <= 64);
+	if (len > 64)
+		return TOTP_EBOUNDS;
 
 	for (i=0; i<64; i++) buf[i] = key[i] ^ 0x36;
 	memcpy(&buf[64], data, len);
@@ -72,9 +75,10 @@ hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
 	for (i=0; i<64; i++) buf[i] = key[i] ^ 0x5C;
 	memcpy(&buf[64], hash, 20);
 	sha1(buf, 64+20, sizeof(buf), hash);
+
+	return TOTP_OK;
 }
 
-/* RFC 4226 */
 int
 hotp(const uint8_t key[64], uint64_t counter)
 {
@@ -89,14 +93,12 @@ hotp(const uint8_t key[64], uint64_t counter)
 	return (int)(trunc % 1000000);
 }
 
-/* RFC 6238 */
 int
 totp(const uint8_t key[64], uint64_t time)
 {
 	return hotp(key, time / 30);
 }
 
-/* RFC 4648 */
 size_t
 from_base32(const char *s, uint8_t *buf, size_t cap)
 {
@@ -113,7 +115,7 @@ from_base32(const char *s, uint8_t *buf, size_t cap)
 			else if (c>='A' && c<='Z') v[j] = c-'A';
 			else if (c>='a' && c<='z') v[j] = c-'a';
 			else if (c>='2' && c<='7') v[j] = c-'2' + 26;
-			else assert(!"bad base32 char");
+			else return 0;
 
 		buf[i*5]   = (v[0] << 3) | (v[1] >> 2);
 		buf[i*5+1] = (v[1] << 6) | (v[2] << 1) | (v[3] >> 4);

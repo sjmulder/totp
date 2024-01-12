@@ -4,6 +4,11 @@
 #include <time.h>
 #include <assert.h>
 
+enum {
+	TOTP_OK,
+	TOTP_EBOUNDS	/* argument out-of-bounds, overflow */
+};
+
 /* convert u32 to 4 bytes, big-endian */
 static inline void
 unpack32(uint32_t x, uint8_t a[4])
@@ -37,16 +42,63 @@ rotl(uint32_t x, int n)
 	return x << n | x >> (32-n);
 }
 
-/* clobbers buf; len and cap in bytes */
-void sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20]);
+/*
+ * FIPS 180-3
+ *
+ * Parameters:
+ *   buf  - input buffer, clobbered
+ *   len  - len of buf, in bytes
+ *   cap  - capacity of buf, in bytes
+ *   hash - output buffer
+ *
+ * Returns TOTP_OK on success, TOTP_* on error
+ */
+int sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20]);
 
-/* outputs to hash */
-void hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
+/*
+ * RFC 2104
+ *
+ * Parameters:
+ *   key   - zero-padded key
+ *   data  - up to 64 bytes of data
+ *   len   - len of data
+ *   hash  - output buffer
+ *
+ * Returns TOTP_OK on success, TOTP_* on error
+ */
+int hmac_sha1(const uint8_t key[64], const uint8_t *data, size_t len,
     uint8_t hash[20]);
 
-/* returns code */
+/*
+ * RFC 4226
+ *
+ * Parameters
+ *   key      - zero-padded shared secret
+ *   counter
+ *
+ * Returns HOTP code or -1 on error.
+ */
 int hotp(const uint8_t key[64], uint64_t counter);
+
+/*
+ * RFC 6238
+ *
+ * Parameters
+ *   key  - zero-padded shared secret
+ *   time - Unix time
+ *
+ * Returns HOTP code or -1 on error.
+ */
 int totp(const uint8_t key[64], uint64_t time);
 
-/* writes to buf, returns length */
+/*
+ * RFC 4648
+ *
+ * Parameters:
+ *   s   - input base32 string, multiple of 8 length
+ *   buf - output buffer, at least 5 bytes for every 8 in s
+ *   cap - capacity of buf, in bytes
+ *
+ * Returns number of bytes written to buf, or 0 for invalid base32.
+ */
 size_t from_base32(const char *s, uint8_t *buf, size_t cap);
