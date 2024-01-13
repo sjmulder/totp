@@ -6,3 +6,4 @@ totp*.exe
 totp.wasm
 test
 test*.exe
+config.mk

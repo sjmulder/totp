@@ -18,6 +18,8 @@ LDFLAGS.wasm+=	-Wl,--no-entry -Wl,--export-dynamic
 
 LINK.wasm=	${CC.wasm} ${CFLAGS.wasm} ${LDFLAGS.wasm}
 
+-include config.mk
+
 all:   ${PROGS}
 cross: ${PROGS.cross}
 
