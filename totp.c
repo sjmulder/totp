@@ -19,27 +19,29 @@ sha1(uint8_t *buf, size_t len, size_t cap, uint8_t hash[20])
 	static const uint32_t k[] = { 0x5A827999, 0x6ED9EBA1,
 	    0x8F1BBCDC, 0xCA62C1D6 };
 
-	size_t len2, i,t;		/* len2 = len after padding */
+	size_t new_len, i,t;		/* new_len = after padding */
 	uint32_t h[5], w[80];		/* hash values, msg schedule */
 	uint32_t a,b,c,d,e, f, T;	/* working variables */
 
 	/* 5.1.1 (padding) */
-	if (len >= SIZE_MAX-9-63)
+
+	/* add 1 byte for stop bit, 8 for length, pad to 64 bytes */
+	if (len > SIZE_MAX-9-63)
 		return TOTP_EBOUNDS;
-	len2 = (len+9+63)/64*64;	/* ceil len+9 to 64 multiple */
-	if (len2 > cap)
+	new_len = (len+9+63)/64*64;	/* ceil len+9 to 64 multiple */
+	if (new_len > cap)
 		return TOTP_EBOUNDS;
 
-	memset(buf+len, 0, len2-len);
+	memset(buf+len, 0, new_len-len);
 	buf[len] = 1<<7;
-	unpack64(len*8, &buf[len2-8]);
+	unpack64(len*8, &buf[new_len-8]);
 
 	/* 5.3.1 */
 	h[0] = 0x67452301; h[1] = 0xEFCDAB89; h[2] = 0x98BADCFE;
 	h[3] = 0x10325476; h[4] = 0xC3D2E1F0;
 
 	/* 6.1.2 */
-	for (i=0; i < len2/64; i++) {
+	for (i=0; i < new_len/64; i++) {
 		for (t=0; t<16; t++)
 			w[t] = pack32(&buf[i*64 + t*4]);
 		for (; t<80; t++)

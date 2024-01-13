@@ -41,7 +41,7 @@ rotl(uint32_t x, int n)
  * FIPS 180-3
  *
  * Parameters:
- *   buf  - input buffer, clobbered
+ *   buf  - input buffer, clobbered, allow for 128 bytes extra
  *   len  - len of buf, in bytes
  *   cap  - capacity of buf, in bytes
  *   hash - output buffer
