@@ -9,6 +9,8 @@ generating codes in 'Authenticator' apps.
 
 Live web version: https://sjmulder.nl/totp/
 
+Details
+-------
 Sources:
  - `totp.{c,h}` - the algorithms.
  - `std.{c,h}` - some libc functions for freestanding targets (WASM,
