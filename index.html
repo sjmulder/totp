@@ -93,7 +93,7 @@
       function refresh() {
         try {
           progress.value = Date.now() / 1000 % 30;
-          output.value = totp.generate(input.value);
+          output.value = input.value ? totp.generate(input.value) : "";
           message.innerText = "";
         } catch (e) {
           output.value = "";
