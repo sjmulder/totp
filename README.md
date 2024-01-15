@@ -5,7 +5,7 @@ for education.
 
 Sources:
  - `totp.{c,h}` - the algorithms.
- - `std.{c,.h}` - some libc functions for freestanding targets (WASM,
+ - `std.{c,h}` - some libc functions for freestanding targets (WASM,
    GBA).
  - `main.c` - a simple CLI.
  - `test.c` - unit tests.
@@ -18,8 +18,9 @@ Targets:
 
 Building
 --------
-    make        # build CLI using default C compiler
-    make cross  # build Windows and WASM targets
+ - `make` to  build CLI using default C compiler
+ - `make check` to run tests
+ - `make cross` to  build Windows and WASM targets
 
 For Windows and WASM, default compilers and flags are specified in
 the Makefile but can be overridden with make flags or `config.mk`,
