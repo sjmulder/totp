@@ -5,6 +5,8 @@ From-scratch, dependency-free implementation of
 including SHA1, for education. TOTP is the most common standard for
 generating codes in 'Authenticator' apps.
 
+![Screenshot](screenshot.png)
+
 Live web version: https://sjmulder.nl/totp/
 
 Sources:
