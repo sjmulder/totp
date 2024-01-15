@@ -23,6 +23,6 @@ main(int argc, char **argv)
 		return 64; /* EX_USAGE */
 	}
 
-	printf("%d\n", totp(key, time(NULL)));
+	printf("%06d\n", totp(key, time(NULL)));
 	return 0;
 }
