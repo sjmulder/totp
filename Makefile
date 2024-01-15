@@ -12,9 +12,15 @@ CC.win64?=	x86_64-w64-mingw32-gcc
 CC.wasm?=	clang -target wasm32
 
 CFLAGS+=	-Wall -Wextra
-CFLAGS.wasm+=	-Wall -Wextra -nostdlib -fvisibility=hidden -DNO_STD
 
-LDFLAGS.wasm+=	-Wl,--no-entry -Wl,--export-dynamic
+CFLAGS.wasm+=	-Wall -Wextra
+CFLAGS.wasm+=	-O2
+CFLAGS.wasm+=	-nostdlib -fvisibility=hidden -DNO_STD
+
+LDFLAGS.wasm+=	-s
+LDFLAGS.wasm+=	-Wl,--no-entry
+LDFLAGS.wasm+=	-Wl,--export-dynamic
+LDFLAGS.wasm+=	-Wl,--import-memory
 
 LINK.wasm=	${CC.wasm} ${CFLAGS.wasm} ${LDFLAGS.wasm}
 
