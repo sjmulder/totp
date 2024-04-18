@@ -101,7 +101,7 @@ test_hotp(void)
 }
 
 static void
-test_from_base64(void)
+test_from_base32(void)
 {
 	uint8_t buf[10];
 
@@ -120,7 +120,7 @@ main()
 	test_sha1();
 	test_hmac_sha1();
 	test_hotp();
-	test_from_base64();
+	test_from_base32();
 
 	return 0;
 }
